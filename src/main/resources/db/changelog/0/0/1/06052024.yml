@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: jhoestevam
+      changes:
+        - createTable:
+            tableName: ruling
+            columns:
+              - column:
+                  name: uuid
+                  type: varchar(36)
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+              - column:
+                  name: description
+                  type: varchar(255)
+              - column:
+                  name: start_date
+                  type: date
+              - column:
+                  name: end_date
+                  type: date
+              - column:
+                  name: votes_in_favor
+                  type: int
+              - column:
+                  name: votes_against
+                  type: int
+              - column:
+                  name: available
+                  type: boolean

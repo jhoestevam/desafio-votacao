@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  app:
+    image: dbserver-challenge-app:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/testdb
+      - SPRING_DATASOURCE_USERNAME=testuser
+      - SPRING_DATASOURCE_PASSWORD=testpassword
+    depends_on:
+      - db
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpassword
+    volumes:
+      - db-data:/var/lib/postgresql/data
+volumes:
+  db-data:
