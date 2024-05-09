@@ -163,6 +163,8 @@ curl -X GET '{base_url}/api/ruling/3fa85f64-5717-4562-b3fc-2c963f66afa6/open'
 curl -X GET '{base_url}/api/ruling/3fa85f64-5717-4562-b3fc-2c963f66afa6/close'
 ```
 
+For more information on the API, please refer to the Swagger documentation `{base_url}/api/swagger-ui.html`.
+
 # Design choices and Technologies Employed
 
 ## Design
@@ -172,7 +174,7 @@ The application is designed using Domain-Driven Design (DDD) and Hexagonal Archi
 DDD is an approach to software development that centers the development on programming a domain model that has a rich understanding of the processes and rules of a domain. This approach is typically used for complex systems where the domain model and the business processes need to be in sync.  In this application, DDD is applied by having a clear separation of the domain layer (`br.challenge.domain.adapters`) from the infrastructure layer (`br.challenge.infrastracture`). The domain layer contains the business logic and the business rules, while the infrastructure layer contains the technical concerns (like database access).
 
 ## Hexagonal Architecture
-Hexagonal Architecture is an architectural style that moves a developer's focus from conceptual layers to a distinction between the software's inside and outside parts. The main idea is to allow an application to equally be driven by users, programs, automated test (Despite the application not having any tests 🤪) or batch scripts, and to be developed and tested in isolation from its eventual run-time devices and databases.
+Hexagonal Architecture is an architectural style that moves a developer's focus from conceptual layers to a distinction between the software's inside and outside parts. The main idea is to allow an application to equally be driven by users, programs, automated test or batch scripts, and to be developed and tested in isolation from its eventual run-time devices and databases.
 
 In this application, Hexagonal Architecture is applied by having clear separations between the application, domain, and infrastructure layers. The application layer is where the use cases are implemented. The domain layer contains the business logic and the business rules. The infrastructure layer contains the technical concerns (like database access).
 
@@ -180,8 +182,9 @@ In this application, Hexagonal Architecture is applied by having clear separatio
 The application uses the following technologies:
 
 * Java: The main programming language used in the application.
-* SQL: Used for defining and manipulating the data in the database.
+* Postgres: An open-source relational database management system emphasizing extensibility and SQL compliance.
 * Spring Boot: An open-source Java-based framework used to create stand-alone, production-grade Spring-based Applications. It is used to simplify the bootstrapping and development of a new Spring application.
+* Liquibase: An open-source database-independent library for tracking, managing, and applying database schema changes.
 * Gradle: A build automation tool focused on flexibility and performance.
 
 ## Application Services

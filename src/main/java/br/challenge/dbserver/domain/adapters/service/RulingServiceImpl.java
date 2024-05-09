@@ -99,7 +99,7 @@ public class RulingServiceImpl implements RulingService {
                             ruling.getVotesAgainst(),
                             percentageFor,
                             result);
-                }).orElseThrow(() -> new NotFoundRulingException("Ruling not found or still open"));
+                }).orElseThrow(() -> new NotFoundRulingException("Ruling not found"));
     }
 
     @Override

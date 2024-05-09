@@ -194,7 +194,7 @@ class RulingControllerTests {
                     .andExpect(status().isNotFound())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$").isNotEmpty())
-                    .andExpect(jsonPath("$").value("Ruling not found or still open"));
+                    .andExpect(jsonPath("$").value("Ruling not found"));
     }
 
     @Test
