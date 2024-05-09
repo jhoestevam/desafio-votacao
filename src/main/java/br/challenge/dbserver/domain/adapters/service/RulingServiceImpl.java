@@ -126,29 +126,32 @@ public class RulingServiceImpl implements RulingService {
     @Override
     @Transactional
     public UUID tallyVoteForRuling(VoteOnRuling voteOnRuling) {
-        this.checkDuplicateVote(voteOnRuling);
-        return rulingRepository.findById(voteOnRuling.rulingId())
-                .map(ruling -> {
-                    this.checkRulingClosedByDate(ruling);
+        return CpfVotingEligibilityValidator.validate(voteOnRuling, this::checkDuplicateVote)
+                .flatMap(rulingRepository::findById)
+                .map(ruling -> computeVote(ruling, voteOnRuling))
+                .orElseThrow(() -> new ValidationRulingException("Ruling not found"));
+    }
 
-                    if (ruling.isAvailable()) {
+    private UUID computeVote(Ruling ruling, VoteOnRuling voteOnRuling) {
+        this.checkRulingClosedByDate(ruling);
 
-                        if (voteOnRuling.voteInFavor()) {
-                            ruling.setVotesInFavor(ruling.getVotesInFavor() + 1);
-                        } else {
-                            ruling.setVotesAgainst(ruling.getVotesAgainst() + 1);
-                        }
+        if (ruling.isAvailable()) {
 
-                        final var vote = new Vote();
-                        vote.setUuid(UUID.randomUUID().toString());
-                        vote.setCpf(voteOnRuling.cpf());
-                        vote.setVoteInFavor(voteOnRuling.voteInFavor());
-                        vote.setRuling(ruling);
+            if (voteOnRuling.voteInFavor()) {
+                ruling.setVotesInFavor(ruling.getVotesInFavor() + 1);
+            } else {
+                ruling.setVotesAgainst(ruling.getVotesAgainst() + 1);
+            }
 
-                        return voteRepository.save(vote);
-                    }
-                    throw new ValidationRulingException("The ruling is closed. It is not possible to vote.");
-                }).orElseThrow(() -> new NotFoundRulingException("Ruling not found"));
+            final var vote = new Vote();
+            vote.setUuid(UUID.randomUUID().toString());
+            vote.setCpf(voteOnRuling.cpf());
+            vote.setVoteInFavor(voteOnRuling.voteInFavor());
+            vote.setRuling(ruling);
+
+            return voteRepository.save(vote);
+        }
+        throw new ValidationRulingException("The ruling is closed. It is not possible to vote.");
     }
 
     private void checkRulingClosedByDate(Ruling ruling) {

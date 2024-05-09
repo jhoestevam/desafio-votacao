@@ -3,6 +3,7 @@
   * [Prerequisites](#prerequisites)
   * [Setup](#setup)
   * [Execution](#execution)
+* [Setting configuration for CPF validation](#setting-configuration-for-cpf-validation)
 * [RulingController API Documentation](#rulingcontroller-api-documentation)
   * [Base URL](#base-url)
   * [1. Create Ruling](#1-create-ruling)
@@ -63,6 +64,27 @@ You can use Docker Compose to run the application. This requires a docker-compos
 docker-compose up
 ```
 This command starts the application along with any services defined in `docker-compose.yml` file.
+
+# Setting configuration for CPF validation
+
+The application uses an external service to validate CPFs. The URL of the service is defined in the environment variable. You can change the URL by setting the `-DCPF_VALIDATOR_URL` variable in the `compose.yaml` docker file. The file will be some like that:
+
+```yaml
+services:
+    app:
+        environment:
+          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/testdb
+          - SPRING_DATASOURCE_USERNAME=testuser
+          - SPRING_DATASOURCE_PASSWORD=testpassword
+          - CPF_VALIDATOR_URL=http://{base_url}
+```
+
+With you prefer to run the application without Docker, you can set the environment variable in the command line. Here's the command:
+
+```bash
+./gradlew build -DCPF_VALIDATOR_URL=https://user-info.herokuapp.com/users/
+```
+
 
 >[!WARNING]
 If you change the name of docker image in the Dockerfile, you need to update the image name in the docker-compose.yml file as well.
