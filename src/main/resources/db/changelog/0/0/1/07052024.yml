@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: jhoestevam
+      changes:
+        - createTable:
+            tableName: vote
+            columns:
+              - column:
+                  name: uuid
+                  type: varchar(36)
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ruling_id
+                  type: varchar(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_vote_ruling
+                    references: ruling(uuid)
+              - column:
+                  name: cpf
+                  type: varchar(14)
+              - column:
+                  name: vote_in_favor
+                  type: boolean

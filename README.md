@@ -1,117 +1,197 @@
-# Votação
+<!-- TOC -->
+* [Application Setup and Execution Guide](#application-setup-and-execution-guide)
+  * [Prerequisites](#prerequisites)
+  * [Setup](#setup)
+  * [Execution](#execution)
+* [RulingController API Documentation](#rulingcontroller-api-documentation)
+  * [Base URL](#base-url)
+  * [1. Create Ruling](#1-create-ruling)
+  * [2. Create Vote](#2-create-vote)
+  * [3. List Rulings](#3-list-rulings)
+  * [4. Get Ruling Result](#4-get-ruling-result)
+  * [5. Open Ruling](#5-open-ruling)
+  * [6. Close Ruling](#6-close-ruling)
+* [Design choices and Technologies Employed](#design-choices-and-technologies-employed)
+  * [Design](#design)
+  * [Domain-Driven Design (DDD)](#domain-driven-design-ddd)
+  * [Hexagonal Architecture](#hexagonal-architecture)
+  * [Technologies](#technologies)
+  * [Application Services](#application-services)
+  * [Records](#records)
+* [Troubleshooting](#troubleshooting)
+<!-- TOC -->
 
-## Objetivo
+# Application Setup and Execution Guide
+This guide provides instructions on how to set up and run the application.
 
-No cooperativismo, cada associado possui um voto e as decisões são tomadas em assembleias, por votação. Imagine que você deve criar uma solução para dispositivos móveis para gerenciar e participar dessas sessões de votação.
-Essa solução deve ser executada na nuvem e promover as seguintes funcionalidades através de uma API REST:
+## Prerequisites
+Before you begin, ensure you have met the following requirements:
+* You have installed Java 21.
+* You have installed Docker 25.0.3.
+* This application was developed using the IntelliJ IDEA 2024.1 IDE.
 
-- Cadastrar uma nova pauta
-- Abrir uma sessão de votação em uma pauta (a sessão de votação deve ficar aberta por
-  um tempo determinado na chamada de abertura ou 1 minuto por default)
-- Receber votos dos associados em pautas (os votos são apenas 'Sim'/'Não'. Cada associado
-  é identificado por um id único e pode votar apenas uma vez por pauta)
-- Contabilizar os votos e dar o resultado da votação na pauta
+## Setup
+Clone the application repository to your local machine using the following command in your terminal:
 
-Para fins de exercício, a segurança das interfaces pode ser abstraída e qualquer chamada para as interfaces pode ser considerada como autorizada. A solução deve ser construída em java, usando Spring-boot, mas os frameworks e bibliotecas são de livre escolha (desde que não infrinja direitos de uso).
-
-É importante que as pautas e os votos sejam persistidos e que não sejam perdidos com o restart da aplicação.
-
-O foco dessa avaliação é a comunicação entre o backend e o aplicativo mobile. Essa comunicação é feita através de mensagens no formato JSON, onde essas mensagens serão interpretadas pelo cliente para montar as telas onde o usuário vai interagir com o sistema. A aplicação cliente não faz parte da avaliação, apenas os componentes do servidor. O formato padrão dessas mensagens será detalhado no anexo 1.
-
-## Como proceder
-
-Por favor, realize o FORK desse repositório e implemente sua solução no FORK em seu repositório GItHub, ao final, notifique da conclusão para que possamos analisar o código implementado.
-
-Lembre de deixar todas as orientações necessárias para executar o seu código.
-
-### Tarefas bônus
-
-- Tarefa Bônus 1 - Integração com sistemas externos
-  - Criar uma Facade/Client Fake que retorna aleátoriamente se um CPF recebido é válido ou não.
-  - Caso o CPF seja inválido, a API retornará o HTTP Status 404 (Not found). Você pode usar geradores de CPF para gerar CPFs válidos
-  - Caso o CPF seja válido, a API retornará se o usuário pode (ABLE_TO_VOTE) ou não pode (UNABLE_TO_VOTE) executar a operação. Essa operação retorna resultados aleatórios, portanto um mesmo CPF pode funcionar em um teste e não funcionar no outro.
-
+```bash
+git clone <repository_url>
 ```
-// CPF Ok para votar
-{
-    "status": "ABLE_TO_VOTE
-}
-// CPF Nao Ok para votar - retornar 404 no client tb
-{
-    "status": "UNABLE_TO_VOTE
-}
+Replace `<repository_url>` with the URL of your Git repository.
+
+Change your current directory to the project's root directory with:
+
+```bash
+cd <project_directory>
 ```
+Replace `<project_directory>` with the name of the directory where you cloned the repository.
 
-Exemplos de retorno do serviço
-
-### Tarefa Bônus 2 - Performance
-
-- Imagine que sua aplicação possa ser usada em cenários que existam centenas de
-  milhares de votos. Ela deve se comportar de maneira performática nesses
-  cenários
-- Testes de performance são uma boa maneira de garantir e observar como sua
-  aplicação se comporta
-
-### Tarefa Bônus 3 - Versionamento da API
-
-○ Como você versionaria a API da sua aplicação? Que estratégia usar?
-
-## O que será analisado
-
-- Simplicidade no design da solução (evitar over engineering)
-- Organização do código
-- Arquitetura do projeto
-- Boas práticas de programação (manutenibilidade, legibilidade etc)
-- Possíveis bugs
-- Tratamento de erros e exceções
-- Explicação breve do porquê das escolhas tomadas durante o desenvolvimento da solução
-- Uso de testes automatizados e ferramentas de qualidade
-- Limpeza do código
-- Documentação do código e da API
-- Logs da aplicação
-- Mensagens e organização dos commits
-
-## Dicas
-
-- Teste bem sua solução, evite bugs
-- Deixe o domínio das URLs de callback passiveis de alteração via configuração, para facilitar
-  o teste tanto no emulador, quanto em dispositivos fisicos.
-  Observações importantes
-- Não inicie o teste sem sanar todas as dúvidas
-- Iremos executar a aplicação para testá-la, cuide com qualquer dependência externa e
-  deixe claro caso haja instruções especiais para execução do mesmo
-  Classificação da informação: Uso Interno
-
-## Anexo 1
-
-### Introdução
-
-A seguir serão detalhados os tipos de tela que o cliente mobile suporta, assim como os tipos de campos disponíveis para a interação do usuário.
-
-### Tipo de tela – FORMULARIO
-
-A tela do tipo FORMULARIO exibe uma coleção de campos (itens) e possui um ou dois botões de ação na parte inferior.
-
-O aplicativo envia uma requisição POST para a url informada e com o body definido pelo objeto dentro de cada botão quando o mesmo é acionado. Nos casos onde temos campos de entrada
-de dados na tela, os valores informados pelo usuário são adicionados ao corpo da requisição. Abaixo o exemplo da requisição que o aplicativo vai fazer quando o botão “Ação 1” for acionado:
-
+Build the project using Gradle with the following command:
+```bash
+./gradlew build
 ```
-POST http://seudominio.com/ACAO1
-{
-    “campo1”: “valor1”,
-    “campo2”: 123,
-    “idCampoTexto”: “Texto”,
-    “idCampoNumerico: 999
-    “idCampoData”: “01/01/2000”
-}
+This command compiles the Java code and packages the application into a JAR file.
+
+## Execution
+You can build the Docker image for the application using the docker build command. Here's the command:
+
+```bash
+docker build -t dbserver-challenge-app:latest .
 ```
 
-Obs: o formato da url acima é meramente ilustrativo e não define qualquer padrão de formato.
+You can use Docker Compose to run the application. This requires a docker-compose.yml file in your project directory. Here's the command:
+```bash
+docker-compose up
+```
+This command starts the application along with any services defined in `docker-compose.yml` file.
 
-### Tipo de tela – SELECAO
+>[!WARNING]
+If you change the name of docker image in the Dockerfile, you need to update the image name in the docker-compose.yml file as well.
 
-A tela do tipo SELECAO exibe uma lista de opções para que o usuário.
+# RulingController API Documentation
 
-O aplicativo envia uma requisição POST para a url informada e com o body definido pelo objeto dentro de cada item da lista de seleção, quando o mesmo é acionado, semelhando ao funcionamento dos botões da tela FORMULARIO.
+This section provides a guide on how to interact with the Ruling API. The API is versioned and currently, version 1 is available. The version is specified in the header of the HTTP request with the key X-API-Version.
 
-# desafio-votacao
+## Base URL
+
+The base URL for the API is `{base_url}/api/ruling`. Please replace `{base_url}` with the actual base URL of the API. Probably it will be `http://localhost:8080`.
+
+## 1. Create Ruling
+
+- **Endpoint**: `/api/ruling`
+- **HTTP Method**: `POST`
+- **Headers**: Content-Type: application/json, X-API-Version: 1
+- **Response**: UUID of the created ruling.
+- **Request Body**:
+    - `title` (required): The title of the ruling.
+    - `description` (required): The description of the ruling.
+    - `end_date` (required): The end date of the ruling in the format `yyyy-MM-dd`
+
+```curl 
+curl -X POST '{base_url}/api/ruling' \
+-H 'Content-Type: application/json' \
+-d '{
+    "title": "Ruling Title",
+    "description": "Ruling Description",
+    "end_date": "2022-12-31"
+}'
+```
+
+## 2. Create Vote
+
+- **Endpoint**: `/api/ruling/vote`
+- **HTTP Method**: `POST`
+- **Headers**: Content-Type: application/json, X-API-Version: 1
+- **Response**: UUID of the created vote.
+- **Request Body**:
+    - `ruling_id` (required): The UUID of the ruling to vote on.
+    - `cpf` (required): The CPF of the voter.
+    - `vote_in_favor` (required): The vote of the voter. `true` for in favor and `false` for against.
+
+```curl
+curl -X POST '{base_url}/api/ruling/vote' \
+-H 'Content-Type: application/json' \
+-d '{
+    "ruling_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "cpf": "123.456.789-00",
+    "vote_in_favor": true
+}'
+```
+
+## 3. List Rulings
+
+- **Endpoint**: `/api/ruling`
+- **HTTP Method**: `GET`
+- **Headers**: Content-Type: application/json, X-API-Version: 1
+- **Query Parameters**: `uuid` (optional) - The UUID of the ruling to retrieve, `status` - The status of the rulings to retrieve.
+- **Response**: List of rulings.
+
+```curl
+curl -X GET '{base_url}/api/ruling?status=OPEN'
+```
+
+## 4. Get Ruling Result
+
+- **Endpoint**: `/api/ruling/{uuid}/result`
+- **HTTP Method**: `GET`
+- **Headers**: Content-Type: application/json, X-API-Version: 1
+- **Path Variable**: `uuid` - The UUID of the ruling to retrieve the result for.
+- **Response**: Result of the ruling.
+
+```curl
+curl -X GET '{base_url}/api/ruling/3fa85f64-5717-4562-b3fc-2c963f66afa6/result'
+```
+
+## 5. Open Ruling
+
+- **Endpoint**: `/api/ruling/{uuid}/open`
+- **HTTP Method**: `GET`
+- **Headers**: Content-Type: application/json, X-API-Version: 1
+- **Path Variable**: `uuid` - The UUID of the ruling to open.
+
+```curl
+curl -X GET '{base_url}/api/ruling/3fa85f64-5717-4562-b3fc-2c963f66afa6/open'
+```
+
+## 6. Close Ruling
+
+- **Endpoint**: `/api/ruling/{uuid}/close`
+- **HTTP Method**: `GET`
+- **Headers**: Content-Type: application/json, X-API-Version: 1
+- **Path Variable**: `uuid` - The UUID of the ruling to close.
+
+```curl
+curl -X GET '{base_url}/api/ruling/3fa85f64-5717-4562-b3fc-2c963f66afa6/close'
+```
+
+# Design choices and Technologies Employed
+
+## Design
+The application is designed using Domain-Driven Design (DDD) and Hexagonal Architecture.
+
+## Domain-Driven Design (DDD)
+DDD is an approach to software development that centers the development on programming a domain model that has a rich understanding of the processes and rules of a domain. This approach is typically used for complex systems where the domain model and the business processes need to be in sync.  In this application, DDD is applied by having a clear separation of the domain layer (`br.challenge.domain.adapters`) from the infrastructure layer (`br.challenge.infrastracture`). The domain layer contains the business logic and the business rules, while the infrastructure layer contains the technical concerns (like database access).
+
+## Hexagonal Architecture
+Hexagonal Architecture is an architectural style that moves a developer's focus from conceptual layers to a distinction between the software's inside and outside parts. The main idea is to allow an application to equally be driven by users, programs, automated test (Despite the application not having any tests 🤪) or batch scripts, and to be developed and tested in isolation from its eventual run-time devices and databases.
+
+In this application, Hexagonal Architecture is applied by having clear separations between the application, domain, and infrastructure layers. The application layer is where the use cases are implemented. The domain layer contains the business logic and the business rules. The infrastructure layer contains the technical concerns (like database access).
+
+## Technologies
+The application uses the following technologies:
+
+* Java: The main programming language used in the application.
+* SQL: Used for defining and manipulating the data in the database.
+* Spring Boot: An open-source Java-based framework used to create stand-alone, production-grade Spring-based Applications. It is used to simplify the bootstrapping and development of a new Spring application.
+* Gradle: A build automation tool focused on flexibility and performance.
+
+## Application Services
+The application main service, `RulingService`, which are responsible for handling ruling and votes respectively. This service use repositories to interact with the database and perform operations like ruling and vote.  The `RulingService` has methods for creating a vote (`VoteOnRuling`) and for computing the ruling (`tallyVoteForRuling`).
+
+## Records
+The application uses records (`CreateRuling`, `ResultRuling`, `VoteOnRuling`) to represent a group of related data items. The state description, which is in the body of the class, is represented by the compact canonical constructor parameters.
+
+# Troubleshooting
+
+Firewall Settings: Ensure that your firewall is not blocking the connection to port 1521.
+
+Check Firewall Settings: Check the firewall settings on both the Windows machine and the Linux server. You might need to configure the firewalls to allow ICMP packets.

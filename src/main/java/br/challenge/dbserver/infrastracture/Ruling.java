@@ -1,4 +1,4 @@
-package br.challenge.dbserver.domain.adapters;
+package br.challenge.dbserver.infrastracture;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class Ruling {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "uuid")
     public String uuid;
 
     @Column(name = "title")

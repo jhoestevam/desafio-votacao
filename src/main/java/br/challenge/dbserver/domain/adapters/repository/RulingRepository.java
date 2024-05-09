@@ -1,6 +1,6 @@
 package br.challenge.dbserver.domain.adapters.repository;
 
-import br.challenge.dbserver.domain.adapters.Ruling;
+import br.challenge.dbserver.infrastracture.Ruling;
 
 import java.util.List;
 import java.util.Optional;

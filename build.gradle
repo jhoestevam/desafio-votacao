@@ -31,7 +31,7 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 
 //	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-//	runtimeOnly 'com.h2database:h2'
+	testRuntimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
